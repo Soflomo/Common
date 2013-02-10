@@ -53,9 +53,9 @@ Available methods are `fromFile($path, $name=null, $type=null, $disposition=null
 ### Version view helper
 For all styles, images and javascript files, a new deployed version might be changed but is available under the same URI. You want to force a reload as a cache busting mechanism, but you do not want to update the version manually each time.
 
-This view helper loads a version description from git with `git describe --always`. For a tag it will return the tag (e.g. `v.1.0.4). If no tag is checked out (for example, on your staging environment) it loads a mixed version (e.g. `v1.0.4-14-g2414721` or when nothing has been tagged `g2414721`). The version can be appended as query string: `css/style.css?v1.0.4`:
+This view helper loads a version description from git with `git describe --always`. For a tag it will return the tag (e.g. `v.1.0.4`). If no tag is checked out (for example, on your staging environment) it loads a mixed version (e.g. `v1.0.4-14-g2414721` or when nothing has been tagged `g2414721`). The version can be appended as query string: `css/style.css?v1.0.4`:
 
 ```
 <?php echo $this->headLink()
-                ->appendStylesheet($this->basePath() . 'css/style.css?' . $this->version())
+                ->appendStylesheet($this->basePath() . 'css/style.css?' . $this->version()); ?>
 ```
