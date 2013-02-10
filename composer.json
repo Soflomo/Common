@@ -1,0 +1,29 @@
+{
+    "name": "soflomo/common",
+    "description": "Utility module with Soflomo common classes",
+    "license": "BSD-3-Clause",
+    "type": "library",
+    "keywords": [
+        "zf2",
+    ],
+    "homepage": "https://github.com/Soflomo/Common",
+    "authors": [
+        {
+            "name": "Jurian Sluiman",
+            "email": "jurian@soflomo.com",
+            "homepage": "http://soflomo.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.3.",
+        "zendframework/zendframework": "2.*"
+    },
+    "autoload": {
+        "psr-0": {
+            "Soflomo\\Common": "src/"
+        },
+        "classmap": [
+            "./Module.php"
+        ]
+    }
+}
