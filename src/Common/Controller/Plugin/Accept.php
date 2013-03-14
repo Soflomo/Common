@@ -1,86 +1,87 @@
 <?php
+/**
+ * Copyright (c) 2012 Soflomo http://soflomo.com.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ *   * Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *
+ *   * Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer in
+ *     the documentation and/or other materials provided with the
+ *     distribution.
+ *
+ *   * Neither the names of the copyright holders nor the names of the
+ *     contributors may be used to endorse or promote products derived
+ *     from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ * COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ * @package     Soflomo\Common
+ * @author      Jurian Sluiman <jurian@soflomo.com>
+ * @copyright   2012 Soflomo http://soflomo.com.
+ * @license     http://www.opensource.org/licenses/bsd-license.php  BSD License
+ */
 
-use Zend\Http\Request;
+namespace Soflomo\Common\Controller\Plugin;
+
 use Zend\Mvc\Controller\Plugin\AbstractPlugin;
-use Zend\Mvc\InjectApplicationEventInterface;
-use Zend\Mvc\MvcEvent;
+use Zend\Http\Header\Accept\FieldValuePart\AcceptFieldValuePart;
 
 class Accept extends AbstractPlugin
 {
-    public function match($mimeType)
+    public function match($types, $exclude = array('*/*'))
     {
-        if (is_string($mimeType)) {
-            $mimeType = (array) $mimeType;
-        } elseif (!is_array($mimeType)) {
+        if (is_string($types)) {
+            $types = (array) $types;
+        } elseif (!is_array($types)) {
             throw new InvalidArgumentException(
                 sprintf('Invalid mime type given, string or array accepted, %s given',
-                        gettype($mimeType)
+                        gettype($types)
                 )
             );
         }
 
-        $headers = $this->getRequest()->getHeaders();
+        $request  = $this->getController()->getRequest();;
+        $headers = $request->getHeaders();
         if (!$headers->has('Accept')) {
             return false;
         }
 
         $accept  = $headers->get('Accept');
-        $against = $this->createMatchedAgainstString($mimeType);
-        return (bool) $accept->match($against);
+        $values = $accept->getPrioritized();
+
+        $list = array();
+        foreach ($values as $value) {
+            if (!in_array($value->getTypeString(), $exclude)) {
+                $list[] = $value->getRaw();
+            }
+        }
+        $values  = implode(',', $list);
+        $accept  = $accept::fromString($values);
+
+        $against = implode(',', $types);
+        $match   = $accept->match($against);
+        return ($match instanceof AcceptFieldValuePart);
     }
 
-    /**
-     * Get the request
-     *
-     * @return Request
-     * @throws DomainException if unable to find request
-     */
-    protected function getRequest()
+    public function __invoke($types)
     {
-        if ($this->request) {
-            return $this->request;
-        }
-
-        $event = $this->getEvent();
-        $request = $event->getRequest();
-        if (!$request instanceof Request) {
-            throw new DomainException(
-                    'The event used does not contain a valid Request, but must.'
-            );
-        }
-
-        $this->request = $request;
-        return $request;
-    }
-
-    /**
-     * Get the event
-     *
-     * @return MvcEvent
-     * @throws DomainException if unable to find event
-     */
-    protected function getEvent()
-    {
-        if ($this->event) {
-            return $this->event;
-        }
-
-        $controller = $this->getController();
-        if (!$controller instanceof InjectApplicationEventInterface) {
-            throw new DomainException(
-                    'A controller that implements InjectApplicationEventInterface '
-                  . 'is required to use ' . __CLASS__
-            );
-        }
-
-        $event = $controller->getEvent();
-        if (!$event instanceof MvcEvent) {
-            $params = $event->getParams();
-            $event = new MvcEvent();
-            $event->setParams($params);
-        }
-        $this->event = $event;
-
-        return $this->event;
+        return $this->match($types);
     }
 }
