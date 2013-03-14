@@ -32,13 +32,13 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * @package     SoflomoCommon
+ * @package     Soflomo\Common
  * @author      Jurian Sluiman <jurian@soflomo.com>
  * @copyright   2012 Soflomo http://soflomo.com.
  * @license     http://www.opensource.org/licenses/bsd-license.php  BSD License
  */
 
-namespace SoflomoCommon\Controller\Plugin;
+namespace Soflomo\Common\Controller\Plugin;
 
 use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 use SoflomoCommon\Exception\InvalidArgumentException;
