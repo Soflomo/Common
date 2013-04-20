@@ -43,12 +43,13 @@ return array(
     'controller_plugins' => array(
         'invokables' => array(
             'accept'     => 'Soflomo\Common\Controller\Plugin\Accept',
-            'attachment' => 'Soflomo\Common\Controller\Plugin\Attachment'
+            'attachment' => 'Soflomo\Common\Controller\Plugin\Attachment',
         ),
     ),
     'view_helpers' => array(
         'invokables' => array(
-            'version'    => 'Soflomo\Common\View\Helper\Version'
+            'submenu'    => 'Soflomo\Common\View\Helper\SubMenu',
+            'version'    => 'Soflomo\Common\View\Helper\Version',
         ),
     ),
 );
