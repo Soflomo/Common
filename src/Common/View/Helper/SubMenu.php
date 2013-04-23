@@ -82,7 +82,7 @@ class SubMenu extends AbstractHelper
         $menu->setRenderInvisible($flag);
 
         if (!$active) {
-            return;
+            return '';
         }
 
         $container = $active['page'];
