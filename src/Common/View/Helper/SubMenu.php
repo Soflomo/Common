@@ -109,15 +109,16 @@ class SubMenu extends AbstractHelper
         // Reset the container
         $menu->setContainer($current);
 
-        if (strlen($html)) {
-            $label = $this->header ?: $container->getLabel();
-
-            return sprintf('<ul%s><li%s><a href="%s">%s</a>%s</li></ul>',
-                    (null !== $this->class) ? ' class="' . $this->class . '"' : null,
-                    ($container->isActive())? ' class="active"' : null,
-                    $container->getHref(),
-                    $label,
-                    $html);
+        if (!strlen($html)) {
+            return '';
         }
+
+        $label = $this->header ?: $container->getLabel();
+        return sprintf('<ul%s><li%s><a href="%s">%s</a>%s</li></ul>',
+                (null !== $this->class) ? ' class="' . $this->class . '"' : null,
+                ($container->isActive())? ' class="active"' : null,
+                $container->getHref(),
+                $label,
+                $html);
     }
 }
