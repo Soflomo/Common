@@ -41,12 +41,15 @@
 namespace Soflomo\Common\View\Helper;
 
 use Zend\View\Helper\AbstractHelper;
+use Zend\I18n\Translator\Translator;
 
 class SubMenu extends AbstractHelper
 {
     protected $level = 0;
     protected $class;
     protected $header;
+    protected $translator;
+    protected $textdomain;
 
     public function __invoke()
     {
@@ -68,6 +71,13 @@ class SubMenu extends AbstractHelper
     public function setHeader($header)
     {
         $this->header = (string) $header;
+        return $this;
+    }
+
+    public function setTranslator(Translator $translator, $textdomain = 'default')
+    {
+        $this->translator = $translator;
+        $this->textdomain = $textdomain;
         return $this;
     }
 
@@ -97,6 +107,15 @@ class SubMenu extends AbstractHelper
         $flag = $container->isVisible();
         $container->setVisible(true);
 
+        // Inject translator
+        $enabled    = $menu->isTranslatorEnabled();
+        $translator = $menu->getTranslator();
+        $textdomain = $menu->getTranslatorTextDomain();
+        if ($this->translator) {
+            $menu->setTranslator($this->translator, $this->textdomain);
+            $menu->setTranslatorEnabled(true);
+        }
+
         $html = $menu->setContainer($container)
                      ->setUlClass('')
                      ->setOnlyActiveBranch(false)
@@ -108,12 +127,19 @@ class SubMenu extends AbstractHelper
         $container->setVisible($flag);
         // Reset the container
         $menu->setContainer($current);
+        // Reset translator
+        $menu->setTranslatorEnabled($enabled);
+        $menu->setTranslator($translator, $textdomain);
 
         if (!strlen($html)) {
             return '';
         }
 
         $label = $this->header ?: $container->getLabel();
+        if ($this->translator) {
+            $label = $this->translator->translate($label, $this->textdomain);
+        }
+
         return sprintf('<ul%s><li%s><a href="%s">%s</a>%s</li></ul>',
                 (null !== $this->class) ? ' class="' . $this->class . '"' : null,
                 ($container->isActive())? ' class="active"' : null,
