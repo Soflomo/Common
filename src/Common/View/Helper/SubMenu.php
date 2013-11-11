@@ -98,7 +98,7 @@ class SubMenu extends AbstractHelper
         $container = $active['page'];
         $depth     = $active['depth'];
 
-        while ($this->level !== $depth) {
+        while ($this->level <= $depth) {
             $container = $container->getParent();
             $depth--;
         }
